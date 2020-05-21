@@ -37,7 +37,7 @@ Fecha Reserva::calculaFechaFinReserva(int cantDias) {
 	int anio = fechaReservacion.getAA();
 	int mess = fechaReservacion.getMM();
 	int diaa = fechaReservacion.getDD();
-	if (mess = 12) {
+	if (mess == 12) {
 		if (diaa + cantDias > 30) {
 			diaa = (diaa + cantDias) - 30;
 			mess = 1;
