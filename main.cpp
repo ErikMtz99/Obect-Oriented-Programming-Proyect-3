@@ -51,7 +51,6 @@ void archivos(Material* mat[], Reserva res[]) {
 		res[j].setFechaReservacion(f_res);
 		res[j].setIdMaterial(id_m);
 		res[j].setIdCliente(id_c);
-		//cout << res[j].getIdCliente() << endl;
 		j++;
 	}
 
@@ -59,6 +58,65 @@ void archivos(Material* mat[], Reserva res[]) {
 	archivo_res.close();
 }
 
+void Reservar(Reserva res[], Fecha f, int id_cl, int id_mat) { 
+	ofstream archivo_res;
+	ifstream archivo_act;
+	archivo_res.open("Reserva_act.txt");
+	int j = 0;
+	while (j < 60) {
+		if (res[j].getIdMaterial() != -1) {
+			archivo_res << res[j].getFechaReservacion().getDD() << " ";
+			archivo_res << res[j].getFechaReservacion().getMM() << " ";
+			archivo_res << res[j].getFechaReservacion().getAA() << " ";
+			archivo_res << res[j].getIdMaterial() << " ";
+			archivo_res << res[j].getIdCliente();
+			archivo_res << endl;
+		}
+
+		j++;
+	}
+	archivo_res << f.getDD() << " " << f.getMM() << " " << f.getAA() << " ";
+	archivo_res << id_mat << " ";
+	archivo_res << id_cl << endl;
+	archivo_res.close(); // aqui el archivo txt ya está actualizado
+
+	archivo_act.open("Reserva_act.txt");
+	int y = 0;
+	int d, m, a, id_m, id_c;
+	while (!archivo_act.eof()) {
+		archivo_act >> d >> m >> a >> id_m >> id_c;
+		Fecha f_act(d, m, a);
+		res[y].setFechaReservacion(f_act);
+		res[y].setIdMaterial(id_m);
+		res[y].setIdCliente(id_c);
+		y++;
+	}
+
+	//archivo_res << "Hola" << "Erik" << "Como" << "estas" << endl;
+	archivo_act.close();
+}
+
+int VerificarMaterial(Material* mat[], int mater) {
+	bool Existe = false;
+	for (int c = 0; c < 30; c++) {
+		if (mater == mat[c]->getIdMaterial())
+		{
+			Existe = true;
+		}
+	}
+	while (Existe == false) {
+		cout << "id del material no existe, ingrese denuevo: ";
+		cin >> mater;
+		cout << endl;
+		for (int c = 0; c < 30; c++) {
+			if (mater == mat[c]->getIdMaterial())
+			{
+				Existe = true;
+			}
+		}
+	}
+	return mater;
+}
 void OpcionA(Material* mat[]) {
 	int i = 0;
 	while (i < 30 && mat[i]->getIdMaterial() != -1)
@@ -107,6 +165,7 @@ void OpcionC(Reserva res[], Material* mat[]) {
 	cin >> material;
 
 	bool Existe = false;
+	bool Existe2 = false;
 
 	for (int c = 0; c < 30; c++) {
 		if (material == mat[c]->getIdMaterial())
@@ -117,6 +176,7 @@ void OpcionC(Reserva res[], Material* mat[]) {
 	while (Existe == false) {
 		cout << "id del material no existe, ingrese denuevo: ";
 		cin >> material;
+		cout << endl;
 		for (int c = 0; c < 30; c++) {
 			if (material == mat[c]->getIdMaterial())
 			{
@@ -138,11 +198,113 @@ void OpcionC(Reserva res[], Material* mat[]) {
 
 		if (material == res[j].getIdMaterial()) {
 			cout << endl;
+			Existe2 = true;
 			cout << "Nombre Material: " << nombre << endl;
 			cout << "Fecha Inicio: " << res[j].getFechaReservacion() << endl;
 			cout << "Fecha Fin: " << res[j].calculaFechaFinReserva(dias_pres) << endl;
 		}
 	}
+	if (Existe2 == false) {
+		cout << "No hay reservaciones de este material. " << endl;
+	}
+}
+
+void OpcionD(Reserva res[], Material* mat[]) {
+	int d, m, a;
+	int r = 0;
+	int dias_pres = 0;
+	int idMaterial = 0;
+	string nombre;
+
+	cout << "ingrese el dia: ";
+	cin >> d;
+	cout << endl;
+	cout << "ingrese el mes (en numero): ";
+	cin >> m;
+	cout << endl;
+	cout << "Ingrese el año: ";
+	cin >> a;
+	cout << endl;
+	Fecha f_res(d, m, a);
+
+	bool reservacion = false;
+
+	for (int j = 0; j < 60; j++) {
+
+		if (f_res == res[j].getFechaReservacion()) {
+			idMaterial = res[j].getIdMaterial();
+			while (r < 30)
+			{
+				if (idMaterial == mat[r]->getIdMaterial()) {
+					dias_pres = mat[r]->cantidadDiasPrestamo();
+					nombre = mat[r]->getTitulo();
+				}
+				r++;
+			}
+			r = 0;
+			reservacion = true;
+			cout << "Nombre: " << nombre << endl;
+			cout << "id Cliente: " << res[j].getIdCliente() << endl;
+			cout << "Fin reservacion: " << res[j].calculaFechaFinReserva(dias_pres);
+			cout << endl << endl;
+		}
+
+	}
+	if (reservacion == false) {
+		cout << "No hay reservaciones en esta fecha. " << endl;
+	}
+
+}
+
+void OpcionE(Reserva res[], Material* mat[]) {
+	int id_mat, id_cl,d,m,a;
+	cout << "Ingrese id de material a reservar: ";
+	cin >> id_mat;
+	cout << endl;
+	id_mat = VerificarMaterial(mat, id_mat);
+
+	cout << "Ingrese id del cliente: ";
+	cin >> id_cl;
+	cout << endl;
+	cout << "Ingrese fecha de reservacion a continuación." << endl;
+	cout << "ingrese el dia: ";
+	cin >> d;
+	cout << endl;
+	cout << "ingrese el mes (en numero): ";
+	cin >> m;
+	cout << endl;
+	cout << "Ingrese el año: ";
+	cin >> a;
+	cout << endl;
+	Fecha f_res(d, m, a);
+
+	bool disponible = false;
+
+	for (int j = 0; j < 60; j++) {
+
+		if (f_res == res[j].getFechaReservacion()) {
+			if (id_mat == res[j].getIdMaterial()) {
+				disponible = false;
+				break;
+			}
+			else {
+				disponible = true;
+			}
+		}
+		else {
+			disponible = true;
+		}
+
+	}
+
+	if (disponible == true) {
+		Reservar(res, f_res, id_cl, id_mat);// Ingresar al archivo la nueva reserva
+		cout << "Reservación exitosa!" << endl;
+	}
+	else {
+		cout << "Material no disponible. Material reservado." << endl;
+	}
+
 
 }
 
@@ -183,10 +345,10 @@ int main() {
 			OpcionC(res, mat);
 			break;
 		case 4:
-			//OpcionD(funciones);
+			OpcionD(res, mat);
 			break;
 		case 5:
-			//OpcionE(funciones, peliculas);
+			OpcionE(res, mat);
 			break;
 		case 6:
 			//OpcionF(actores, peliculas);
