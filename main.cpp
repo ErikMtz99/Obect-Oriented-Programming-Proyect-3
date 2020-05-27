@@ -5,12 +5,13 @@
 
 using namespace std;
 
-void archivos(Material* mat[], Reserva res[]) {
+int archivos(Material* mat[], Reserva res[]) {
 	ifstream archivo_mat, archivo_res;
 	archivo_mat.open("Material.txt");
 	archivo_res.open("Reserva.txt");
 
-	Fecha def(0,0,0);
+	int cont = 0;
+	Fecha def(0, 0, 0);
 
 	for (int x = 0; x < 30; x++) {
 		mat[x] = new Disco(-1, "-1", -1, "-1");
@@ -51,49 +52,39 @@ void archivos(Material* mat[], Reserva res[]) {
 		res[j].setFechaReservacion(f_res);
 		res[j].setIdMaterial(id_m);
 		res[j].setIdCliente(id_c);
+		cont = cont + 1;
 		j++;
 	}
 
 	archivo_mat.close();
 	archivo_res.close();
+	return cont;
 }
 
-void Reservar(Reserva res[], Fecha f, int id_cl, int id_mat) { 
+void Reservar(Reserva res[], Fecha f, int id_cl, int id_mat, int contador) {
 	ofstream archivo_res;
 	ifstream archivo_act;
-	archivo_res.open("Reserva_act.txt");
+	archivo_res.open("Reserva.txt");
 	int j = 0;
-	while (j < 60) {
-		if (res[j].getIdMaterial() != -1) {
+	res[contador-1].setFechaReservacion(f);
+	res[contador-1].setIdCliente(id_cl);
+	res[contador-1].setIdMaterial(id_mat);
+
+	while (res[j].getIdMaterial() != -1) {
 			archivo_res << res[j].getFechaReservacion().getDD() << " ";
 			archivo_res << res[j].getFechaReservacion().getMM() << " ";
 			archivo_res << res[j].getFechaReservacion().getAA() << " ";
 			archivo_res << res[j].getIdMaterial() << " ";
 			archivo_res << res[j].getIdCliente();
 			archivo_res << endl;
-		}
 
 		j++;
 	}
-	archivo_res << f.getDD() << " " << f.getMM() << " " << f.getAA() << " ";
-	archivo_res << id_mat << " ";
-	archivo_res << id_cl << endl;
-	archivo_res.close(); // aqui el archivo txt ya está actualizado
+	//	archivo_res << f.getDD() << " " << f.getMM() << " " << f.getAA() << " ";
+	//	archivo_res << id_mat << " ";
+	//	archivo_res << id_cl << endl;
+	//archivo_res.close(); // aqui el archivo txt ya está actualizado
 
-	archivo_act.open("Reserva_act.txt");
-	int y = 0;
-	int d, m, a, id_m, id_c;
-	while (!archivo_act.eof()) {
-		archivo_act >> d >> m >> a >> id_m >> id_c;
-		Fecha f_act(d, m, a);
-		res[y].setFechaReservacion(f_act);
-		res[y].setIdMaterial(id_m);
-		res[y].setIdCliente(id_c);
-		y++;
-	}
-
-	//archivo_res << "Hola" << "Erik" << "Como" << "estas" << endl;
-	archivo_act.close();
 }
 
 int VerificarMaterial(Material* mat[], int mater) {
@@ -256,8 +247,8 @@ void OpcionD(Reserva res[], Material* mat[]) {
 
 }
 
-void OpcionE(Reserva res[], Material* mat[]) {
-	int id_mat, id_cl,d,m,a;
+void OpcionE(Reserva res[], Material* mat[], int contador) {
+	int id_mat, id_cl, d, m, a;
 	cout << "Ingrese id de material a reservar: ";
 	cin >> id_mat;
 	cout << endl;
@@ -298,7 +289,7 @@ void OpcionE(Reserva res[], Material* mat[]) {
 	}
 
 	if (disponible == true) {
-		Reservar(res, f_res, id_cl, id_mat);// Ingresar al archivo la nueva reserva
+		Reservar(res, f_res, id_cl, id_mat, contador);// Ingresar al archivo la nueva reserva
 		cout << "Reservación exitosa!" << endl;
 	}
 	else {
@@ -311,15 +302,9 @@ void OpcionE(Reserva res[], Material* mat[]) {
 int main() {
 	Material* mat[30] = {};
 	Reserva res[60] = {};
-	archivos(mat, res);
-
-	//mat[20]->muestraDatos();
-	//mat[20]->muestraDatos();
-	//res[2].getFechaReservacion();
-	//cout << endl;
-	//cout << res[3].getFechaReservacion();
 
 	while (true) {
+		int contador = archivos(mat, res);
 
 		cout << endl;
 		cout << "Ingrese una de las siguientes opciones porfavor: " << endl;
@@ -348,7 +333,7 @@ int main() {
 			OpcionD(res, mat);
 			break;
 		case 5:
-			OpcionE(res, mat);
+			OpcionE(res, mat, contador);
 			break;
 		case 6:
 			//OpcionF(actores, peliculas);
