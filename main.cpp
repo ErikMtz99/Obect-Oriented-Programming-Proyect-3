@@ -314,7 +314,6 @@ int main() {
 		cout << "[4] Consultar reservaciones de una fecha dada" << endl;
 		cout << "[5] Hacer una reservacion" << endl;
 		cout << "[6] Terminar" << endl;
-		cout << "[7] Salir" << endl;
 		int respuesta;
 		bool salir = false;
 		cin >> respuesta;
@@ -336,9 +335,6 @@ int main() {
 			OpcionE(res, mat, contador);
 			break;
 		case 6:
-			//OpcionF(actores, peliculas);
-			break;
-		case 7:
 			cout << "Quisiera salir de la aplicacion? (SI = 1, NO = 2)" << endl;
 			int respuesta2;
 			cin >> respuesta2;
@@ -348,7 +344,6 @@ int main() {
 			}
 			else {}
 			break;
-
 		default:
 			cout << "numero invalido, intente denuevo" << endl;
 		}
